@@ -3,6 +3,7 @@
 class DSPace implements Repository{
 	
 	private $thesisCommunity;
+	private $thesisCollections;
 	private $dspaceURL;
 
 	function __construct($dspaceURL) {
@@ -75,9 +76,48 @@ class DSPace implements Repository{
 		//TODO: finish this implementation
 	}
 
+	private function restGet($url){
+		$html = implode('', file($url)); // Return a String.
+		$phpNative = Zend\Json\Encoder::encodeUnicodeString($html); // Encodes the String $html
+		return Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY); // Decode the encode returning an array with a thesis for each index.
+	}
+	
+	private function getThesisCollections(){
+		$url=$this->dspaceURL."/rest/communities/".$this->thesisCommunity."/collections";
+		return $this->restGet($url);
+	}
+	
+	
+	private function getThesisCollection($name){
+		if (!isset($this->thesisCollections)){
+			$this->thesisCollections=$this->getThesisCollections();
+		}
+		
+		foreach ($this->thesisCollections as $collection){
+			if ($collection['name']==$name){
+				return $collection['uuid'];
+			}
+		}
+		return "";
+	}
+
+
+	private function createThesisCollection($name){
+		$url=$this->dspaceURL."/rest/communities/".$this->thesisCommunity."/collections";
+		$data='
+{
+  "name":"'.$name.'"
+}';
+		return restPost($url,$data);
+	}	
+	
 	private function saveUsingRestApi($t){
 		if (!isset($this->dspaceURL)){
 			throw new Exception("Variable dspaceURL is not set.");
+		}
+		$collectionUUID=$this->getThesisCollection($t->getCollection());
+		if ($collectionUUID==""){
+			$collectionUUID=$this->createThesisCollection($t->getCollection());
 		}
 	}
 
@@ -87,7 +127,7 @@ class DSPace implements Repository{
 			throw new Exception("Variable thesisCommunity is not set. Use setThesisCommunity");
 		}
 		
-		saveUsingRestApi($t);
+		$this->saveUsingRestApi($t);
 		
 	}
 }
