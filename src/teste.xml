@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dublin_core schema="dc">
+  <dcvalue element="contributor" qualifier="author">Elias, Welman Curi</dcvalue>
+  <dcvalue element="title">Síntese e caracterização de nanocubos de Pd e Pd@In: investigação da sensibilidade à estrutura e composição em reações de homoacoplamento C-C do tipo Suzuki e redução de nitrato</dcvalue>
+  <dcvalue element="date" qualifier="issued">2017</dcvalue>
+  <dcvalue element="format" qualifier="extent">1 v.| il., gráfs.</dcvalue>
+  <dcvalue element="description" qualifier="abstract"/>
+  <dcvalue element="description" qualifier="abstract" language="en"/>
+  <dcvalue element="subject" qualifier="classification">Química</dcvalue>
+  <dcvalue element="contributor" qualifier="advisor">Domingos, Josiel Barbosa </dcvalue>
+  <dcvalue element="contributor" qualifier="advisor-co">Wong, Michael S.</dcvalue>
+  <dcvalue element="contributor">Universidade Federal de Santa Catarina</dcvalue>
+</dublin_core>

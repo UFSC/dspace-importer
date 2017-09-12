@@ -1,0 +1,14 @@
+
+{
+	"100-a-1":"dc.contributor.author",
+	"245-a-1":"dc.title",
+	"260-a-1":"dc.publisher",
+	"260-c-1":"dc.date.issued",
+	"300-a-1":"dc.format.extent",
+	"520-a-1":"dc.description.abstract",
+	"520-a-2":"dc.description.abstract.en",
+	"650-a-1":"dc.subject.classification",
+	"700-a-1":"dc.contributor.advisor",
+	"700-a-2":"dc.contributor.advisor-co",
+	"710-a-1":"dc.contributor"
+}
