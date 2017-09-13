@@ -32,7 +32,7 @@ class Pergamum2DSpaceThesisSynchronizer extends GenericThesisSynchronizer {
 		$this->loadConfig($configFile);
 		$this->setMetadataConverter(new Pergamum2DSPaceThesisMetadataConverter($this->getMapFile()));
 		$this->setOriginRepository(new Pergamum($this->config['pergamum-ws-url']));
-		$dspace = new DSpace($this->config['dspace-url']);
+		$dspace = new DSpace($this->config['dspace-url'], $this->config['dspace-username'], $this->config['dspace-password']);
 		$dspace->setThesisCommunity($this->config['dspace-thesis-community']);
 		$this->setTargetRepository($dspace);
 	}

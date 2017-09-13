@@ -1,6 +1,5 @@
 <?php
 
-
 interface Thesis {
 	//Returns a metadata field
 	function getMetadata($metadataField);
@@ -20,6 +19,8 @@ interface Thesis {
 	//set and get for files
 	function getFiles();
 	function addFile($path);
+
+	function toString();
 }
 
 ?>
