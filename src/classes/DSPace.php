@@ -4,11 +4,13 @@ use Zend\Http\Client;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
-class DSPace implements Repository {
+require 'Subject.php';
 
-	const THESIS_KEY_FIELD = "dc.identifier.other";
-	private $thesisCommunity;
-	private $thesisCollections;
+class DSPace implements Repository, Subject {
+
+	const ITEM_KEY_FIELD = "dc.identifier.other";
+	private $baseCommunity;
+	private $collections;
 	private $dspaceURL;
 	private $dspaceRestCookie;
 	private $dspaceUsername;
@@ -20,18 +22,22 @@ class DSPace implements Repository {
 		$this->dspacePassword = $dspacePassword;
 	}
 
-	//returns all thesis available of a given year
-	public function getAllThesis($year) {
-
+	//returns all items available of a given year
+	public function getAllItems($year) {
+		//TODO: implement this
 	}
 
-	//returns a Thesis with a given id
-	public function getThesis($id) {
-
+	//returns a item with a given id
+	public function getItem($id) {
+		//TODO
 	}
 
-	public function setThesisCommunity($c) {
-		$this->thesisCommunity = $c;
+	public function setBaseCommunity($c) {
+		$this->baseCommunity = $c;
+	}
+
+	public function notify($event) {
+		//TODO: implement observer
 	}
 
 	private function generateXml($t) {
@@ -89,7 +95,7 @@ class DSPace implements Repository {
 	private function restGet($url) {
 		$html = implode('', file($url)); // Return a String.
 		$phpNative = Zend\Json\Encoder::encodeUnicodeString($html); // Encodes the String $html
-		return Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY); // Decode the encode returning an array with a thesis for each index.
+		return Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY);
 	}
 
 	private function restAuth() {
@@ -121,20 +127,25 @@ class DSPace implements Repository {
 				'Content-Type' => 'application/json',
 			));
 		}
-		return $client->send($request);
+		$response = $client->send($request);
+		if ($response->getStatusCode() != 200) {
+			throw new Exception("Error Sending POST rest request at " . $url . " Error message: " . $response->getContent());
+
+		}
+		return $response;
 	}
 
-	private function getThesisCollections() {
-		$url = $this->dspaceURL . "/rest/communities/" . $this->thesisCommunity . "/collections";
+	private function getCollections() {
+		$url = $this->dspaceURL . "/rest/communities/" . $this->baseCommunity . "/collections";
 		return $this->restGet($url);
 	}
 
-	private function getThesisCollection($name) {
-		if (!isset($this->thesisCollections)) {
-			$this->thesisCollections = $this->getThesisCollections();
+	private function getCollection($name) {
+		if (!isset($this->collections)) {
+			$this->collections = $this->getCollections();
 		}
 
-		foreach ($this->thesisCollections as $collection) {
+		foreach ($this->collections as $collection) {
 			if ($collection['name'] == $name) {
 				return $collection['uuid'];
 			}
@@ -150,21 +161,31 @@ class DSPace implements Repository {
 		return $response;
 	}
 
-	private function createItem($collectionUUID, $json) {
+	private function createItem($collectionUUID, $name) {
 		$url = $this->dspaceURL . "/rest/collections/" . $collectionUUID . "/items";
+		$data = '{"name":"' . $name . '"}';
 		$response = $this->restPost($url, $json);
 		$response = Zend\Json\Json::decode($response->getContent(), Zend\Json\Json::TYPE_ARRAY);
 		return $response['uuid'];
 	}
 
-	private function createThesisCollection($name) {
-		$url = $this->dspaceURL . "/rest/communities/" . $this->thesisCommunity . "/collections";
+	private function updateItemMetadata($itemUUID, $newMetadata) {
+		$url = $this->dspaceURL . "/rest/items/" . $itemUUID . "/metadata";
+		$response = $this->restPost($url, $newMetadata);
+		print_r($response);
+		die;
+		$response = Zend\Json\Json::decode($response->getContent(), Zend\Json\Json::TYPE_ARRAY);
+		return $response['uuid'];
+	}
+
+	private function createCollection($name) {
+		$url = $this->dspaceURL . "/rest/communities/" . $this->baseCommunity . "/collections";
 		$data = '{"name":"' . $name . '"}';
 		$response = $this->restPost($url, $data);
 
 		//Invalidate collections cache
-		unset($this->thesisCollections);
-		$response = Zend\Json\Json::decode($response->getContent(), Zend\Json\Json::TYPE_ARRAY); // Decode the encode returning an array with a thesis for each index.
+		unset($this->collections);
+		$response = Zend\Json\Json::decode($response->getContent(), Zend\Json\Json::TYPE_ARRAY);
 		$this->notify("Collection created:" . $response['uuid']);
 		return $response['uuid'];
 	}
@@ -178,24 +199,31 @@ class DSPace implements Repository {
 		$this->restAuth();
 
 		//Check target collection
-		$collectionUUID = $this->getThesisCollection($t->getCollection());
+		$collectionUUID = $this->getCollection($t->getCollection());
 		if ($collectionUUID == "") {
-			$collectionUUID = $this->createThesisCollection($t->getCollection());
+			$collectionUUID = $this->createCollection($t->getCollection());
 		}
 
 		//Check if item exists
-		$items = $this->getItemByField(self::THESIS_KEY_FIELD, $t->getId());
+		$items = $this->getItemByField(self::ITEM_KEY_FIELD, $t->getId());
 		if (count($items) == 0) {
 			$itemUUID = $this->createItem($collectionUUID, $t->toString());
 			$this->notify("Item created:" . $itemUUID);
+		} else {
+			//TODO: support many items
+			$itemUUID = $items[0]['uuid'];
 		}
-		$this->updateItem($itemUUID, $t->toString());
+		//update item metadata
+		$this->updateItemMetadata($itemUUID, $t->metadataToString());
+
+		//TODO: update item bitstreams
+
 	}
 
 	//save a Thesis
-	public function saveThesis($t) {
-		if (!isset($this->thesisCommunity)) {
-			throw new Exception("Variable thesisCommunity is not set. Use setThesisCommunity");
+	public function saveItem($t) {
+		if (!isset($this->baseCommunity)) {
+			throw new Exception("Variable baseCommunity is not set. Use setBaseCommunity");
 		}
 
 		$this->saveUsingRestApi($t);

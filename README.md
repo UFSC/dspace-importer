@@ -1,12 +1,12 @@
 # dspace-importer
 Migration tool for DSpace. Collects data from other repositories and submit to dspace
 
-#Requirements
+# Requirements
 
 * Zend Framework
 * SimpleXML
 
-#Usage
+# Usage
 
 Configure your options in config/config.ini
 

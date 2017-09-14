@@ -8,26 +8,26 @@ class Pergamum implements Repository {
 
 	private $wsURL;
 
-	public function getAllThesis($year) {
-		return $this->getThesisFromWS("ano=" . $year);
+	public function getAllItems($year) {
+		return $this->getItemsFromWS("ano=" . $year);
 	}
 
 	function __construct($wsURL) {
 		$this->wsURL = $wsURL;
 	}
 
-	private function getThesisFromWS($args) {
+	private function getItemsFromWS($args) {
 		$url = $this->wsURL;
 		if ($args != "") {
 			$url = $url . "?" . $args;
 		}
 		$html = implode('', file($url)); // Return a String.
 		$phpNative = Zend\Json\Encoder::encodeUnicodeString($html); // Encodes the String $html
-		$teses = Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY); // Decode the encode returning an array with a thesis for each index.
+		$teses = Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY);
 		$r = Array();
 		for ($i = 0; $i <= sizeof($teses); $i++) {
 			if (array_key_exists($i, $teses)) {
-				$t = new ThesisImpl();
+				$t = new ItemImpl();
 				$acervo = $teses[$i]["cod_acervo"];
 				$t->setId($acervo);
 				if ($teses[$i]["links"] != "") {
@@ -57,13 +57,14 @@ class Pergamum implements Repository {
 	}
 
 	//returns a Thesis with a given id
-	public function getThesis($id) {
-		return $this->getThesisFromWS("acervo=" . $id);
+	public function getItem($id) {
+		return $this->getItemFromWS("acervo=" . $id);
 	}
 
 	//save a Thesis
-	public function saveThesis($t) {
-		throw new Exception("Saving thesis on Pergamum not available yet");
+	public function saveItem($t) {
+		//TODO: implement this
+		throw new Exception("Saving items on Pergamum not available yet");
 	}
 }
 ?>

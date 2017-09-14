@@ -1,11 +1,11 @@
 <?php
 
-interface ThesisSynchronizer{
-	//geters and seters for the repository from where the thesis will be extracted
+interface ItemSynchronizer {
+	//geters and seters for the repository from where the items will be extracted
 	public function getOriginRepository();
 	public function setOriginRepository($o);
 
-	//geters and seters for the repository to where the thesis will be imported
+	//geters and seters for the repository to where the items will be imported
 	public function getTargetRepository();
 	public function setTargetRepository($t);
 

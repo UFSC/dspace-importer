@@ -1,13 +1,13 @@
 <?php
 
-interface Repository{
+interface Repository {
 	//returns all thesis available of a given year
-	public function getAllThesis($year);
+	public function getAllItems($year);
 
 	//returns a Thesis with a given id
-	public function getThesis($id);
+	public function getItem($id);
 
 	//save a Thesis
-	public function saveThesis($t);
+	public function saveItem($t);
 }
 ?>

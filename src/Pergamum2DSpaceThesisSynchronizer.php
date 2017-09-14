@@ -1,12 +1,12 @@
 <?php
 
-require 'classes\GenericThesisSynchronizer.php';
+require 'classes\GenericItemSynchronizer.php';
 require 'Pergamum2DSPaceThesisMetadataConverter.php';
 require 'classes\Pergamum.php';
 require 'classes\DSpace.php';
 use Zend\Config;
 
-class Pergamum2DSpaceThesisSynchronizer extends GenericThesisSynchronizer {
+class Pergamum2DSpaceThesisSynchronizer extends GenericItemSynchronizer {
 	private $config;
 
 	private function loadConfig($configFile) {
@@ -33,7 +33,7 @@ class Pergamum2DSpaceThesisSynchronizer extends GenericThesisSynchronizer {
 		$this->setMetadataConverter(new Pergamum2DSPaceThesisMetadataConverter($this->getMapFile()));
 		$this->setOriginRepository(new Pergamum($this->config['pergamum-ws-url']));
 		$dspace = new DSpace($this->config['dspace-url'], $this->config['dspace-username'], $this->config['dspace-password']);
-		$dspace->setThesisCommunity($this->config['dspace-thesis-community']);
+		$dspace->setBaseCommunity($this->config['dspace-thesis-community']);
 		$this->setTargetRepository($dspace);
 	}
 }
