@@ -58,11 +58,18 @@ class ItemImpl implements Item {
 	}
 
 	function metadataToString() {
-		$output = "[";
+		$output = "{\"metadata\":[";
+		$first = 0;
 		foreach ($this->getMedatataFields() as $field) {
+			if ($first == 0) {
+				$first = 1;
+			} else {
+				$output = $output . ',';
+			}
 			$output = $output . '{"key":"' . $field . '","value":"' . $this->getMetadata($field) . '"}';
 		}
-		$output = $output . "]";
+		$output = $output . "]}";
+		return $output;
 	}
 }
 
