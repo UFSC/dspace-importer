@@ -16,11 +16,13 @@ class DSPace implements Repository, Subject {
 	private $dspaceRestCookie;
 	private $dspaceUsername;
 	private $dspacePassword;
+	private $observers;
 
 	function __construct($dspaceURL, $dspaceUsername, $dspacePassword) {
 		$this->dspaceURL = $dspaceURL;
 		$this->dspaceUsername = $dspaceUsername;
 		$this->dspacePassword = $dspacePassword;
+		$this->observers = Array();
 	}
 
 	//returns all items available of a given year
@@ -37,8 +39,14 @@ class DSPace implements Repository, Subject {
 		$this->baseCommunity = $c;
 	}
 
+	public function register($observer) {
+		$this->observers[] = $observer;
+	}
+
 	public function notify($event) {
-		//TODO: implement observer
+		foreach ($this->observers as $obs) {
+			$obs->update($event);
+		}
 	}
 
 	private function generateXml($t) {
@@ -329,8 +337,8 @@ class DSPace implements Repository, Subject {
 		//Check if item exists
 		$items = $this->getItemByField(self::ITEM_KEY_FIELD, $t->getId());
 		if (count($items) == 0) {
-			$itemUUID = "002ae26e-9d40-4119-bff9-815b05307f7c";
-			//$itemUUID = $this->createItem($collectionUUID, $t->metadataToString());
+			$this->notify("Creating item:" . $t->getId());
+			$itemUUID = $this->createItem($collectionUUID, $t->metadataToString());
 			$this->notify("Item created:" . $itemUUID);
 
 			//add bitstreams
@@ -341,9 +349,7 @@ class DSPace implements Repository, Subject {
 		} else {
 			//TODO: update item metadata
 			$itemUUID = $items[0]['uuid'];
-			$this->deleteItem($itemUUID);
-			return;
-			$this->addItemMetadata($itemUUID, $t->metadataToString());
+			//$this->addItemMetadata($itemUUID, $t->metadataToString());
 		}
 
 	}

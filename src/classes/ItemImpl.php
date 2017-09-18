@@ -33,6 +33,10 @@ class ItemImpl implements Item {
 		return $this->fields;
 	}
 
+	function hasMetadataField($field) {
+		return array_key_exists($field, $this->fields);
+	}
+
 	function getCollection() {
 		return $this->collection;
 	}

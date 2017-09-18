@@ -24,9 +24,11 @@ class Pergamum2DSPaceThesisMetadataConverter extends ItemMetadataConverter {
 
 	//join MARC format fields in a single dublin core field
 	private function convertMarcFormat2DC($marc, $dc) {
-		$formatA = $marc->getMetadata(self::MARC_FORMAT_A);
-		$formatB = $marc->getMetadata(self::MARC_FORMAT_B);
-		$dc->setMetadata(self::DC_FORMAT, $formatA . "| " . $formatB);
+		$format = $marc->getMetadata(self::MARC_FORMAT_A);
+		if ($marc->hasMetadataField(self::MARC_FORMAT_B)) {
+			$format = $format . "| " . $marc->getMetadata(self::MARC_FORMAT_B);
+		}
+		$dc->setMetadata(self::DC_FORMAT, $format);
 	}
 
 	//returns all thesis available of a given year

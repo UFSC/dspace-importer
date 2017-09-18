@@ -7,9 +7,14 @@ class Pergamum implements Repository {
 	const MARC_COLLECTION_FIELD = '710-b-1';
 
 	private $wsURL;
+	private $defaultCollection;
 
 	public function getAllItems($year) {
 		return $this->getItemsFromWS("ano=" . $year);
+	}
+
+	function setDefaultCollection($collection) {
+		$this->defaultCollection = $collection;
 	}
 
 	function __construct($wsURL) {
@@ -30,7 +35,7 @@ class Pergamum implements Repository {
 				$t = new ItemImpl();
 				$acervo = $teses[$i]["cod_acervo"];
 				$t->setId($acervo);
-				if ($teses[$i]["links"] != "") {
+				if (array_key_exists("links", $teses[$i]) && $teses[$i]["links"] != "") {
 					$t->addFile($teses[$i]["links"]);
 				}
 				//metadados
@@ -49,7 +54,14 @@ class Pergamum implements Repository {
 					$value = html_entity_decode($camposMarc[$j]["descricao"]);
 					$t->setMetadata($field, $value);
 				}
-				$t->setCollection($t->getMetadata(self::MARC_COLLECTION_FIELD));
+				if ($t->hasMetadataField(self::MARC_COLLECTION_FIELD)) {
+					$t->setCollection($t->getMetadata(self::MARC_COLLECTION_FIELD));
+				} else if ($this->defaultCollection != "") {
+					$t->setCollection($this->defaultCollection);
+				} else {
+					throw new Exception("Item does not have default collection field '" . self::MARC_COLLECTION_FIELD . "' and there is no default collection configured. Use setDefaultCollection");
+				}
+
 				array_push($r, $t);
 			}
 		}

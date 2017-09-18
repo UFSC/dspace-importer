@@ -7,6 +7,7 @@ interface Item {
 	function setMetadata($metadataField, $value);
 	//Get all metadata fields
 	function getMedatataFields();
+	function hasMetadataField($field);
 	function metadataToString();
 
 	//set and get for collection
