@@ -15,6 +15,10 @@ class ItemImpl implements Item {
 	//Returns a metadata field
 	function getMetadata($metadataField) {
 		if (in_array($metadataField, $this->fields)) {
+			if (!is_array($this->metadata[$metadataField])) {
+				throw new Exception("Field '" . $metadataField . "' is not an array");
+
+			}
 			return $this->metadata[$metadataField];
 		} else {
 			throw new Exception("Field '" . $metadataField . "' not found");
@@ -22,19 +26,28 @@ class ItemImpl implements Item {
 
 	}
 	//Set a metadata field
-	function setMetadata($metadataField, $value) {
+	function setMetadata($metadataField, $array) {
 		if (!in_array($metadataField, $this->fields)) {
 			array_push($this->fields, $metadataField);
 		}
-		$this->metadata[$metadataField] = $value;
+		$this->metadata[$metadataField] = $array;
 	}
+
+	function addMetadata($metadataField, $value) {
+		if (!in_array($metadataField, $this->fields)) {
+			array_push($this->fields, $metadataField);
+			$this->metadata[$metadataField] = Array();
+		}
+		array_push($this->metadata[$metadataField], $value);
+	}
+
 	//Get all metadata fields
 	function getMedatataFields() {
 		return $this->fields;
 	}
 
 	function hasMetadataField($field) {
-		return array_key_exists($field, $this->fields);
+		return in_array($field, $this->fields);
 	}
 
 	function getCollection() {
@@ -65,12 +78,14 @@ class ItemImpl implements Item {
 		$output = "{\"metadata\":[";
 		$first = 0;
 		foreach ($this->getMedatataFields() as $field) {
-			if ($first == 0) {
-				$first = 1;
-			} else {
-				$output = $output . ',';
+			foreach ($this->getMetadata($field) as $value) {
+				if ($first == 0) {
+					$first = 1;
+				} else {
+					$output = $output . ',';
+				}
+				$output = $output . '{"key":"' . $field . '","value":"' . str_replace('"', '\"', $value) . '"}';
 			}
-			$output = $output . '{"key":"' . $field . '","value":"' . $this->getMetadata($field) . '"}';
 		}
 		$output = $output . "]}";
 		return $output;

@@ -3,8 +3,8 @@ Migration tool for DSpace. Collects data from other repositories and submit to d
 
 # Requirements
 
-* Zend Framework
-* SimpleXML
+* Zend Framework 3
+* DSpace 6.1
 
 # Usage
 

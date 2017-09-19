@@ -5,10 +5,22 @@
 	"260-a-1":"dc.publisher",
 	"260-c-1":"dc.date.issued",
 	"300-a-1":"dc.format.extent",
+	"502-a-1":"dc.description",
 	"520-a-1":"dc.description.abstract",
 	"520-a-2":"dc.description.abstract.en",
 	"650-a-1":"dc.subject.classification",
+	"650-a-2":"dc.subject.classification",
+	"650-a-3":"dc.subject.classification",
+	"650-a-4":"dc.subject.classification",
+	"650-a-5":"dc.subject.classification",
+	"650-a-6":"dc.subject.classification",
+	"650-a-7":"dc.subject.classification",
+	"650-a-8":"dc.subject.classification",
+	"650-a-9":"dc.subject.classification",
 	"700-a-1":"dc.contributor.advisor",
 	"700-a-2":"dc.contributor.advisor-co",
-	"710-a-1":"dc.contributor"
+	"710-a-1":"dc.contributor",
+	"cod_acervo": "dc.identifier.other",
+	"idioma": "dc.language.iso",
+	"nota_monog": "dc.type"
 }

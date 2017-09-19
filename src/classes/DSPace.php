@@ -49,7 +49,7 @@ class DSPace implements Repository, Subject {
 		}
 	}
 
-	private function generateXml($t) {
+	/*private function generateXml($t) {
 		$doc = new DOMDocument();
 		$doc->version = '1.0';
 		$doc->encoding = 'UTF-8';
@@ -91,7 +91,7 @@ class DSPace implements Repository, Subject {
 		}
 		$doc->formatOutput = true;
 		return $doc;
-	}
+	}*/
 
 	private function saveUsingSimpleArchiveFormat($t) {
 		$xml = $this->generateXml($t);
@@ -146,7 +146,7 @@ class DSPace implements Repository, Subject {
 		}
 	}
 
-	private function restPost($url, $data, $file = "") {
+	private function restPost($url, $data) {
 		//echo "URL: " . $url . PHP_EOL;
 		$request = new Request();
 		$request->setMethod(Request::METHOD_POST);
@@ -169,13 +169,10 @@ class DSPace implements Repository, Subject {
 				'Content-Type' => 'application/json',
 			));
 		}
-		if ($file != "") {
-			//echo "File: " . $file . PHP_EOL;
-			$client->setFileUpload('C:\Users\04574440961\Downloads\00250144181751001_2016.pdf', '00250144181751001_2016.pdf');
-		}
 		$response = $client->send($request);
 		if ($response->getStatusCode() != 200) {
-			throw new Exception("Error Sending POST rest request at " . $url . " Error message: " . $response->getContent());
+			echo "Data: " . $data . PHP_EOL;
+			throw new Exception("Error Sending POST rest request at " . $url . " Error message: " . $response->getContent() . PHP_EOL);
 		}
 		return $response;
 	}
@@ -222,7 +219,7 @@ class DSPace implements Repository, Subject {
 		$client->setFileUpload($file, basename($file));
 		$response = $client->send();
 		if ($response->getStatusCode() != 200) {
-			throw new Exception("Error Sending POST rest request at " . $url . " Error message: " . $response->getContent());
+			throw new Exception("Error Sending POST UPLOAD rest request at " . $url . " Error message: " . $response->getContent());
 		}
 		return $response;
 	}
@@ -262,6 +259,7 @@ class DSPace implements Repository, Subject {
 	}
 
 	private function getItemByField($field, $value) {
+		$this->notify("Finding item '" . $value . "' by field '" . $field . "'");
 		$url = $this->dspaceURL . "/rest/items/find-by-metadata-field";
 		$data = '{"key":"' . $field . '", "value":"' . $value . '"}';
 		$response = $this->restPost($url, $data);
@@ -320,6 +318,35 @@ class DSPace implements Repository, Subject {
 		return $response['uuid'];
 	}
 
+	private function generateItemJson($i) {
+		$output = "{\"metadata\":[";
+		$first = 0;
+		foreach ($i->getMedatataFields() as $field) {
+			foreach ($i->getMetadata($field) as $value) {
+				if ($first == 0) {
+					$first = 1;
+				} else {
+					$output = $output . ',';
+				}
+				//Check if field has language component
+				$language = "";
+				if (substr_count($field, '.') > 2) {
+					$pos = strrpos($field, '.');
+					$language = substr($field, $pos + 1);
+					$field = substr($field, 0, $pos);
+				}
+
+				$output = $output . '{"key":"' . $field . '","value":"' . str_replace('"', '\"', $value) . '"';
+				if ($language != "") {
+					$output = $output . ',"language":"' . $language . '"';
+				}
+				$output = $output . '}';
+			}
+		}
+		$output = $output . "]}";
+		return $output;
+	}
+
 	private function saveUsingRestApi($t) {
 		if (!isset($this->dspaceURL)) {
 			throw new Exception("Variable dspaceURL is not set.");
@@ -338,7 +365,7 @@ class DSPace implements Repository, Subject {
 		$items = $this->getItemByField(self::ITEM_KEY_FIELD, $t->getId());
 		if (count($items) == 0) {
 			$this->notify("Creating item:" . $t->getId());
-			$itemUUID = $this->createItem($collectionUUID, $t->metadataToString());
+			$itemUUID = $this->createItem($collectionUUID, $this->generateItemJson($t));
 			$this->notify("Item created:" . $itemUUID);
 
 			//add bitstreams
@@ -359,8 +386,11 @@ class DSPace implements Repository, Subject {
 		if (!isset($this->baseCommunity)) {
 			throw new Exception("Variable baseCommunity is not set. Use setBaseCommunity");
 		}
-
-		$this->saveUsingRestApi($t);
+		try {
+			$this->saveUsingRestApi($t);
+		} catch (Exception $e) {
+			$this->notify("Error saving item: " . $e->getMessage());
+		}
 
 	}
 }

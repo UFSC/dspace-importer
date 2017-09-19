@@ -3,12 +3,13 @@
 interface Item {
 	//Returns a metadata field
 	function getMetadata($metadataField);
+	//add metadata field
+	function addMetadata($metadataField, $value);
 	//Set a metadata field
-	function setMetadata($metadataField, $value);
+	function setMetadata($metadataField, $array);
 	//Get all metadata fields
 	function getMedatataFields();
 	function hasMetadataField($field);
-	function metadataToString();
 
 	//set and get for collection
 	function getCollection();

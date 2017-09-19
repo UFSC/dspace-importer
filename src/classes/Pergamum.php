@@ -5,6 +5,7 @@ use Zend\Json;
 
 class Pergamum implements Repository {
 	const MARC_COLLECTION_FIELD = '710-b-1';
+	const MARC_PARAGRAFO_ABSTRACT = "520";
 
 	private $wsURL;
 	private $defaultCollection;
@@ -24,7 +25,7 @@ class Pergamum implements Repository {
 	private function getItemsFromWS($args) {
 		$url = $this->wsURL;
 		if ($args != "") {
-			$url = $url . "?" . $args;
+			$url = $url . "teses.php?" . $args;
 		}
 		$html = implode('', file($url)); // Return a String.
 		$phpNative = Zend\Json\Encoder::encodeUnicodeString($html); // Encodes the String $html
@@ -33,13 +34,23 @@ class Pergamum implements Repository {
 		for ($i = 0; $i <= sizeof($teses); $i++) {
 			if (array_key_exists($i, $teses)) {
 				$t = new ItemImpl();
+
+				//id
 				$acervo = $teses[$i]["cod_acervo"];
 				$t->setId($acervo);
+
+				//outros metadados no registro principal
+				foreach ($teses[$i] as $key => $value) {
+					$t->addMetadata($key, $value);
+				}
+
+				//arquivos
 				if (array_key_exists("links", $teses[$i]) && $teses[$i]["links"] != "") {
 					$t->addFile($teses[$i]["links"]);
 				}
-				//metadados
-				$html = implode('', file("http://setic.sites.ufsc.br/pergamumws/marc.php?cod_acervo=" . $acervo)); // Returns a String.
+
+				//metadados MARC
+				$html = implode('', file($this->wsURL . "marc.php?cod_acervo=" . $acervo)); // Returns a String.
 				$phpNative = Zend\Json\Encoder::encodeUnicodeString($html);
 				$camposMarc = Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY);
 
@@ -51,11 +62,22 @@ class Pergamum implements Repository {
 					if ($camposMarc[$j]["seq_paragrafo"] != '') {
 						$field = $field . "-" . $camposMarc[$j]["seq_paragrafo"];
 					}
-					$value = html_entity_decode($camposMarc[$j]["descricao"]);
-					$t->setMetadata($field, $value);
+					//Abstract comes from another database field
+					if ($camposMarc[$j]["paragrafo"] == self::MARC_PARAGRAFO_ABSTRACT) {
+						$value = html_entity_decode($camposMarc[$j]["texto_descricao"]);
+						//remove CR/LF from abstract
+						$value = str_replace(chr(13), '', $value);
+						$value = str_replace(chr(10), '', $value);
+						$value = str_replace("", '', $value);
+					} else {
+						$value = html_entity_decode($camposMarc[$j]["descricao"]);
+					}
+					$t->addMetadata($field, $value);
 				}
+
+				//coleção
 				if ($t->hasMetadataField(self::MARC_COLLECTION_FIELD)) {
-					$t->setCollection($t->getMetadata(self::MARC_COLLECTION_FIELD));
+					$t->setCollection(array_values($t->getMetadata(self::MARC_COLLECTION_FIELD))[0]);
 				} else if ($this->defaultCollection != "") {
 					$t->setCollection($this->defaultCollection);
 				} else {

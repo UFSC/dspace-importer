@@ -28,10 +28,13 @@ class ItemMetadataConverter implements MetadataConverter {
 			foreach ($object->getMedatataFields() as $originField) {
 				$targetField = $this->getConversion($originField);
 				if ($targetField != "") {
-					$r->setMetadata($targetField, $object->getMetadata($originField));
+					foreach ($object->getMetadata($originField) as $value) {
+						$r->addMetadata($targetField, $value);
+					}
 				}
 			}
 			return $r;
+
 		} else {
 			throw new Exception("ItemMetadataConverter can convert only Item objects");
 		}
