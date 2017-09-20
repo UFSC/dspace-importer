@@ -35,7 +35,8 @@ class GenericItemSynchronizer implements ItemSynchronizer {
 		}
 
 		$itemList = $this->origin->getAllItems($year);
-		foreach ($itemList as $itemOrigin) {
+		while (count($itemList) > 0) {
+			$itemOrigin = array_shift($itemList);
 			$itemTarget = $this->metadataConverter->convert($itemOrigin);
 			$itemTarget->setId($itemOrigin->getId());
 			$itemTarget->setCollection($itemOrigin->getCollection());
