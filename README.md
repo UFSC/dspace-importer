@@ -8,8 +8,10 @@ Migration tool for DSpace. Collects data from other repositories and submit to d
 
 # Usage
 
-Configure your options in config/config.ini
+* Configure your options in config/config.ini and pergamumws/parametros.php
 
-Importing from Pergamum:
+* Deploy the folder pergamumws in a Web server that supports PHP
 
-php src/Pergamum2DSpace.php -c config/config.ini
+* Importing from Pergamum:
+
+ php src/Pergamum2DSpace.php -c config/config.ini >> /var/log/somelogfile.log
