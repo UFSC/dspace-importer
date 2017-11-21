@@ -5,6 +5,7 @@ Migration tool for DSpace. Collects data from other repositories and submit to d
 
 * Zend Framework 3
 * DSpace 6.1
+* PHPExcel
 
 # Usage
 
@@ -15,3 +16,7 @@ Migration tool for DSpace. Collects data from other repositories and submit to d
 * Importing from Pergamum:
 
  php src/Pergamum2DSpace.php -c config/config.ini >> /var/log/somelogfile.log
+ 
+ * Importing from XLS File:
+
+ php src/XLS2DSpace.php -c config/config.ini >> /var/log/somelogfile.log

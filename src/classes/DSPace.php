@@ -26,8 +26,11 @@ class DSPace implements Repository, Subject {
 	}
 
 	//returns all items available of a given year
-	public function getAllItems($year) {
+	public function getItemsByYear($year) {
 		//TODO: implement this
+	}
+
+	public function getAllItems() {
 	}
 
 	//returns a item with a given id

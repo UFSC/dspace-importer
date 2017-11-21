@@ -1,0 +1,11 @@
+
+{
+	"B": "dc.identifier.other",
+	"C":"dc.title",
+	"D":"dc.description.abstract",
+	"E":"dc.date.issued",
+	"G":"dc.subject",
+	"J":"dc.contributor.author",
+	"K":"dc.contributor.advisor",
+	"L":"dc.contributor"
+}

@@ -10,6 +10,8 @@ interface ItemSynchronizer {
 	public function setTargetRepository($t);
 
 	//synchronize repositories of a specific year
-	public function syncRepos($year);
+	public function syncReposByYear($year);
+	//Sync entire repositories
+	public function syncRepos();
 }
 ?>

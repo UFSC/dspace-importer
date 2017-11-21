@@ -29,12 +29,23 @@ class GenericItemSynchronizer implements ItemSynchronizer {
 	}
 
 	//synchronize repositories of a specific year
-	public function syncRepos($year) {
+	public function syncReposByYear($year) {
+		$itemList = $this->origin->getItemsByYear($year);
+		$this->__syncRepos($itemList);
+	}
+
+	//synchronize entire repositories
+	public function syncRepos() {
+		$itemList = $this->origin->getAllItems();
+		$this->__syncRepos($itemList);
+	}
+
+	//synchronize entire repositories
+	private function __syncRepos($itemList) {
 		if (!isset($this->metadataConverter)) {
 			throw Exception("Metadata converter is not set. Use setMetadataConverter before calling this method");
 		}
 
-		$itemList = $this->origin->getAllItems($year);
 		while (count($itemList) > 0) {
 			$itemOrigin = array_shift($itemList);
 			$itemTarget = $this->metadataConverter->convert($itemOrigin);
