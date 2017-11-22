@@ -7,5 +7,7 @@
 	"G":"dc.subject",
 	"J":"dc.contributor.author",
 	"K":"dc.contributor.advisor",
-	"L":"dc.contributor"
+	"L":"dc.contributor.other",
+	"descricao": "dc.description",
+	"tipo": "dc.type"
 }

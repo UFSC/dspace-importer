@@ -10,6 +10,7 @@ class XLS implements Repository {
 	const XLS_ID_COLUMN = 'B';
 	const XLS_DIR_COLUMN = 'H';
 	const XLS_FILE_COLUMN = 'I';
+	const XLS_NAME_COLUMNS = array('J', 'K', 'L');
 
 	private $defaultCollection;
 
@@ -34,6 +35,17 @@ class XLS implements Repository {
 
 	}
 
+	private function formatName($name) {
+		$names = explode(" ", $name);
+		$result = end($names) . ",";
+		foreach ($names as $value) {
+			if ($value != end($names)) {
+				$result = $result . " " . $value;
+			}
+		}
+		return $result;
+	}
+
 	private function getItemsFromXLS($filter_field = null, $filter_value = null) {
 		$objPHPExcel = PHPExcel_IOFactory::load($this->xlsPath);
 		$r = Array();
@@ -56,7 +68,15 @@ class XLS implements Repository {
 					if (!is_null($cell)) {
 						$value = $cell->getCalculatedValue();
 						if ($value != "") {
-							$t->addMetadata(substr($cell->getCoordinate(), 1, 1), $value);
+							if (in_array(substr($cell->getCoordinate(), 0, 1), self::XLS_NAME_COLUMNS)) {
+								//names separated by semicolon
+								foreach (explode(';', $value) as $name) {
+									$t->addMetadata(substr($cell->getCoordinate(), 0, 1), $this->formatName($name));
+								}
+							} else {
+								//atomic values
+								$t->addMetadata(substr($cell->getCoordinate(), 0, 1), $value);
+							}
 						}
 						//echo '       Cell - ', $cell->getCoordinate(), ' - ', $cell->getCalculatedValue(), EOL;
 					}
@@ -66,6 +86,10 @@ class XLS implements Repository {
 				$t->addFile($dir . '/' . $file);
 
 				$t->setCollection("TCC " . $worksheet->getCell(self::XLS_COLLECTION_COLUMN . $row->getRowIndex())->getCalculatedValue());
+
+				$t->addMetadata("descricao", "TCC (graduação) - Universidade Federal de Santa Catarina. Centro Tecnológico. Curso de " . $worksheet->getCell(self::XLS_COLLECTION_COLUMN . $row->getRowIndex())->getCalculatedValue() . ".");
+				$t->addMetadata("tipo", "TCCgrad");
+
 				$t->setId($worksheet->getCell(self::XLS_ID_COLUMN . $row->getRowIndex())->getCalculatedValue());
 				array_push($r, $t);
 			}
