@@ -339,7 +339,7 @@ class DSPace implements Repository, Subject {
 					$field = substr($field, 0, $pos);
 				}
 
-				$output = $output . '{"key":"' . $field . '","value":"' . str_replace('"', '\"', $value) . '"';
+				$output = $output . '{"key":"' . $field . '","value":"' . str_replace("\t", '\t', str_replace("\n", '\n', str_replace('"', '\"', $value))) . '"';
 				if ($language != "") {
 					$output = $output . ',"language":"' . $language . '"';
 				}
@@ -369,13 +369,13 @@ class DSPace implements Repository, Subject {
 		if (count($items) == 0) {
 			$this->notify("Creating item:" . $t->getId());
 			$itemUUID = $this->createItem($collectionUUID, $this->generateItemJson($t));
-			$this->notify("Item created:" . $itemUUID);
+			$this->notify("Item created:" . $itemUUID . " on collection " . $collectionUUID);
 
 			//add bitstreams
 			foreach ($t->getFiles() as $file) {
-				$this->addItemBitstream($itemUUID, $file);
+				$bitstreamUUID = $this->addItemBitstream($itemUUID, $file);
+				$this->notify("Item bitstream added:" . $bitstreamUUID);
 			}
-
 		} else {
 			//TODO: update item metadata
 			$itemUUID = $items[0]['uuid'];

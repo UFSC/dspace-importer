@@ -11,6 +11,7 @@ class XLS implements Repository {
 	const XLS_DIR_COLUMN = 'H';
 	const XLS_FILE_COLUMN = 'I';
 	const XLS_NAME_COLUMNS = array('J', 'K', 'L');
+	const XLS_SUBJECT_COLUMN = 'G';
 
 	private $defaultCollection;
 
@@ -68,14 +69,21 @@ class XLS implements Repository {
 					if (!is_null($cell)) {
 						$value = $cell->getCalculatedValue();
 						if ($value != "") {
-							if (in_array(substr($cell->getCoordinate(), 0, 1), self::XLS_NAME_COLUMNS)) {
-								//names separated by semicolon
-								foreach (explode(';', $value) as $name) {
-									$t->addMetadata(substr($cell->getCoordinate(), 0, 1), $this->formatName($name));
+							if (in_array(substr($cell->getCoordinate(), 0, 1), self::XLS_NAME_COLUMNS) || (substr($cell->getCoordinate(), 0, 1) == self::XLS_SUBJECT_COLUMN)) {
+								if (substr($cell->getCoordinate(), 0, 1) == self::XLS_SUBJECT_COLUMN) {
+									//subjects separated by comma
+									foreach (explode(',', $value) as $subject) {
+										$t->addMetadata(substr($cell->getCoordinate(), 0, 1), trim($subject));
+									}
+								} else {
+									//names separated by semicolon
+									foreach (explode(';', $value) as $name) {
+										$t->addMetadata(substr($cell->getCoordinate(), 0, 1), trim($this->formatName($name)));
+									}
 								}
 							} else {
 								//atomic values
-								$t->addMetadata(substr($cell->getCoordinate(), 0, 1), $value);
+								$t->addMetadata(substr($cell->getCoordinate(), 0, 1), trim($value));
 							}
 						}
 						//echo '       Cell - ', $cell->getCoordinate(), ' - ', $cell->getCalculatedValue(), EOL;
