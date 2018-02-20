@@ -10,7 +10,12 @@ class Pergamum implements Repository {
 	private $wsURL;
 	private $defaultCollection;
 
-	public function getAllItems($year) {
+
+	public function getAllItems() {
+                return $this->getItemsFromWS();
+        }
+
+	public function getItemsByYear($year) {
 		return $this->getItemsFromWS("ano=" . $year);
 	}
 
@@ -22,11 +27,12 @@ class Pergamum implements Repository {
 		$this->wsURL = $wsURL;
 	}
 
-	private function getItemsFromWS($args) {
+	private function getItemsFromWS($args="") {
 		$url = $this->wsURL;
 		if ($args != "") {
 			$url = $url . "teses.php?" . $args;
 		}
+		echo "Calling ".$url.PHP_EOL;
 		$html = implode('', file($url)); // Return a String.
 		$phpNative = Zend\Json\Encoder::encodeUnicodeString($html); // Encodes the String $html
 		$teses = Zend\Json\Json::decode($phpNative, Zend\Json\Json::TYPE_ARRAY);
@@ -41,7 +47,7 @@ class Pergamum implements Repository {
 
 				//outros metadados no registro principal
 				foreach ($teses[$i] as $key => $value) {
-					$t->addMetadata($key, $value);
+					$t->addMetadata($key, html_entity_decode($value));
 				}
 
 				//arquivos

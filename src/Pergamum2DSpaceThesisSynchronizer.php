@@ -1,10 +1,10 @@
 <?php
 
-require 'classes\GenericItemSynchronizer.php';
+require 'classes'.DIRECTORY_SEPARATOR.'GenericItemSynchronizer.php';
 require 'Pergamum2DSPaceThesisMetadataConverter.php';
-require 'classes\Pergamum.php';
-require 'classes\DSpace.php';
-require 'classes\Observer.php';
+require 'classes'.DIRECTORY_SEPARATOR.'Pergamum.php';
+require 'classes'.DIRECTORY_SEPARATOR.'DSPace.php';
+require 'classes'.DIRECTORY_SEPARATOR.'Observer.php';
 use Zend\Config;
 
 class Pergamum2DSpaceThesisSynchronizer extends GenericItemSynchronizer implements Observer {
