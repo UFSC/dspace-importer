@@ -1,5 +1,5 @@
 <?php
-require 'classes\ItemMetadataConverter.php';
+require 'classes'.DIRECTORY_SEPARATOR.'ItemMetadataConverter.php';
 
 //Customizações para conversão entre Pergamum e DSpace
 class Pergamum2DSPaceThesisMetadataConverter extends ItemMetadataConverter {

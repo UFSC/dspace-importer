@@ -45,7 +45,7 @@ class GenericItemSynchronizer implements ItemSynchronizer {
 		if (!isset($this->metadataConverter)) {
 			throw Exception("Metadata converter is not set. Use setMetadataConverter before calling this method");
 		}
-
+		echo "Syncing ".count($itemList)." items".PHP_EOL;
 		while (count($itemList) > 0) {
 			$itemOrigin = array_shift($itemList);
 			$itemTarget = $this->metadataConverter->convert($itemOrigin);

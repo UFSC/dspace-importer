@@ -1,6 +1,8 @@
 <?php
 
-	require_once realpath('C:\Users\04574440961\vendor/autoload.php');
+	//set_include_path('/usr/share/php/libzend-framework-php/');
+	//require_once 'Zend/Loader/Autoloader.php';
+	require_once realpath('/home/dspace/vendor/autoload.php');
 	require 'Pergamum2DSpaceThesisSynchronizer.php';
 
 
@@ -18,5 +20,6 @@
 	}
 
 	$sync = new Pergamum2DSpaceThesisSynchronizer($configFile);
-	$sync->syncRepos(date("Y"));
+	$sync->syncReposByYear(date("Y")-1);
+	$sync->syncReposByYear(date("Y"));
 ?>
