@@ -91,7 +91,7 @@ class XLS implements Repository {
 				}
 				$dir = $worksheet->getCell(self::XLS_DIR_COLUMN . $row->getRowIndex())->getCalculatedValue();
 				$file = $worksheet->getCell(self::XLS_FILE_COLUMN . $row->getRowIndex())->getCalculatedValue();
-				$t->addFile($dir . '/' . $file);
+				$t->addFile($dir . '/' . rawurlencode($file));
 
 				$t->setCollection("TCC " . $worksheet->getCell(self::XLS_COLLECTION_COLUMN . $row->getRowIndex())->getCalculatedValue());
 

@@ -261,6 +261,12 @@ class DSPace implements Repository, Subject {
 		return "";
 	}
 
+	private function getBitstreams($itemUUID) {
+		$url = $this->dspaceURL . "/rest/items/" . $itemUUID . "/bitstreams";
+		$response = $this->restGet($url);
+		return $response;
+	}
+
 	private function getItemByField($field, $value) {
 		$this->notify("Finding item '" . $value . "' by field '" . $field . "'");
 		$url = $this->dspaceURL . "/rest/items/find-by-metadata-field";
@@ -377,9 +383,18 @@ class DSPace implements Repository, Subject {
 				$this->notify("Item bitstream added:" . $bitstreamUUID);
 			}
 		} else {
+			$item = array_shift($items);
+			$itemUUID = $item['uuid'];
 			//TODO: update item metadata
-			$itemUUID = $items[0]['uuid'];
 			//$this->addItemMetadata($itemUUID, $t->metadataToString());
+
+			if (count($this->getBitstreams($itemUUID)) == 0) {
+				//add bitstreams
+				foreach ($t->getFiles() as $file) {
+					$bitstreamUUID = $this->addItemBitstream($itemUUID, $file);
+					$this->notify("Item bitstream added:" . $bitstreamUUID);
+				}
+			}
 		}
 
 	}
