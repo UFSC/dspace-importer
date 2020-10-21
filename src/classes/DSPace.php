@@ -253,7 +253,7 @@ class DSPace implements Repository, Subject {
 		}
 
 		foreach ($this->collections as $collection) {
-			if ($collection['name'] == $name) {
+			if (trim($collection['name']) == trim($name)) {
 				return $collection['uuid'];
 			}
 		}
